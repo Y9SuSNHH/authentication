@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Models\User;
+use App\Services\Auth\AbstractLoginService;
+use App\Services\Auth\LoginServiceInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -15,25 +17,17 @@ final class AuthController extends Controller
 {
     use ResponseTrait;
 
-    public function login(LoginRequest $loginRequest)
+    /**
+     * @param LoginRequest $loginRequest
+     * @param LoginServiceInterface $loginService
+     * @return JsonResponse
+     */
+    public function login(LoginRequest $loginRequest, LoginServiceInterface $loginService): JsonResponse
     {
         try {
-            $user = User::query()->where('email', $loginRequest->get('email'))->firstOrFail();
-            if (!Hash::check($loginRequest->get('password'), $user->password)) {
-                return redirect()->route('signin')->with('failed', 'Sai mật khẩu');
-            }
+            $data = $loginService->login($loginRequest);
 
-            Auth::login($user);
-            $token = hash('sha256', session()->getId());
-            $user->remember_token = $token;
-            $user->save();
-            $key = "token:$token";
-            Redis::set($key, json_encode($user->toArray()));
-            Redis::expire($key, getenv('SESSION_LIFETIME') * 60);
-
-            return $this->successResponse([
-                'token' => $token,
-            ]);
+            return $this->successResponse($data);
         } catch (\Throwable $e) {
             return $this->errorResponse($e->getMessage());
         }

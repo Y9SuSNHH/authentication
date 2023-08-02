@@ -23,4 +23,12 @@ trait ResponseTrait
             'message' => $message
         ], $status);
     }
+
+    /**
+     * @return JsonResponse
+     */
+    public function unauthorized(): JsonResponse
+    {
+        return $this->errorResponse('Unauthorized', [], 401);
+    }
 }

@@ -112,4 +112,6 @@ return [
 
     'password_timeout' => 10800,
 
+    'access_token' => env('ACCESS_TOKEN_LIFETIME', 60),
+    'refresh_token' => env('REFRESH_TOKEN_LIFETIME', 365),
 ];

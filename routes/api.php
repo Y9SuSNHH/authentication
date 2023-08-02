@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers;
-use App\Http\Middleware\AuthSession;
-use Illuminate\Http\Request;
+use App\Http\Middleware\LoginMiddleware;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 Route::post('login', [Controllers\AuthController::class, 'login']);
 Route::post('register', [Controllers\AuthController::class, 'register']);
-Route::middleware([AuthSession::class])->group(function () {
+Route::middleware([LoginMiddleware::class])->group(function () {
     Route::prefix('info')->group(function () {
         Route::get('/', [Controllers\InfoController::class, 'show']);
     });
